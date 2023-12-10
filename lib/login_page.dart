@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                 )
             );
           } else {
-            // Home page redirection
+            Navigator.pushNamed(context, '/homepage');
           }
         },
         style: ElevatedButton.styleFrom(
