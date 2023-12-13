@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wine_shazam/home_page.dart';
+import 'package:wine_shazam/main_page.dart';
 import 'package:wine_shazam/login_page.dart';
 
 const purpleColor = Color(0xFFA065C3);
@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
       useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: const LoginPage(),
       routes: {
-        '/homepage': (context) => const HomePage(),
+        '/homepage': (context) => const MainPage(),
       },
     );
   }
