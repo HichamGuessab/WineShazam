@@ -6,6 +6,7 @@ import 'package:wine_shazam/models/wine_model.dart';
 import 'package:wine_shazam/models/winery_model.dart';
 import 'package:wine_shazam/pages/wine_details_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class BarCodePage extends StatefulWidget {
   const BarCodePage({super.key});
@@ -80,7 +81,7 @@ class _BarCodePageState extends State<BarCodePage> {
   }
 
   Future<Wine?> _requestWineWithBarCode(String code) async {
-    final url = 'http://10.126.4.113:3000/api/wine?barCode=$code';
+    final url = 'http://${dotenv.env['SHAZVINCORE_HOST']}:3000/api/wine?barCode=$code';
 
     try {
       final response = await http.get(Uri.parse(url));

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:wine_shazam/main_page.dart';
 import 'package:wine_shazam/login_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 const purpleColor = Color(0xFFA065C3);
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
+
   runApp(const MyApp());
 }
 
