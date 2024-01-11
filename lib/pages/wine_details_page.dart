@@ -4,10 +4,12 @@ import '../models/wine_model.dart';
 
 class WineDetailsPage extends StatelessWidget {
   final Wine wine;
+  final double averageRating;
 
   const WineDetailsPage({
     Key? key,
     required this.wine,
+    required this.averageRating,
   }) : super(key: key);
 
   @override
@@ -29,6 +31,7 @@ class WineDetailsPage extends StatelessWidget {
               _buildInfoSection(
                   "Date de mise en bouteille", wine.bottlingDate.toString()),
               _buildInfoSection("Prix", "${wine.price}€"),
+              _buildInfoSection("Note moyenne", "$averageRating"),
 
               const SizedBox(height: 30),
 

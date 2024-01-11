@@ -44,7 +44,7 @@ class _SearchPageState extends State<SearchPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => WineDetailsPage(wine: wine)
+                        builder: (context) => WineDetailsPage(wine: wine, averageRating: 5.0)
                     )
                   );
                 }

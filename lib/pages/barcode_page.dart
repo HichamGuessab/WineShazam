@@ -44,14 +44,16 @@ class _BarCodePageState extends State<BarCodePage> {
                   Navigator.of(context).pop(); // Close the dialog
                 })
               } else {
-                _displayBarCodeDetected('Un vin a été trouvé !', () {
-                  Navigator.of(context).pop();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => WineDetailsPage(wine: wine)
-                      )
-                  );
+                _requestAverageRating(wine.id).then((average) => {
+                  _displayBarCodeDetected('Un vin a été trouvé !', () {
+                    Navigator.of(context).pop();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => WineDetailsPage(wine: wine, averageRating: average)
+                        )
+                    );
+                  })
                 })
               }
 
@@ -95,10 +97,30 @@ class _BarCodePageState extends State<BarCodePage> {
       debugPrint('HTTP Request Failed: ${response.statusCode}');
       return null;
     } catch (e) {
-      rethrow;
       // Handle potential errors during the request
       debugPrint('HTTP Request Error: $e');
       return null;
+    }
+  }
+
+  Future<double> _requestAverageRating(int wineId) async {
+    final url = 'http://${dotenv.env['SHAZVINCORE_HOST']}:3000/api/note/average/$wineId';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // Handle the successful response if needed
+        debugPrint('HTTP Request Successful: ${response.body}');
+        Map<String, dynamic> mapAverage = json.decode(response.body);
+        return double.tryParse(mapAverage['average']) ?? 0.0;
+      }
+      debugPrint('HTTP Request Failed: ${response.statusCode}');
+      return 0.0;
+    } catch (e) {
+      // Handle potential errors during the request
+      debugPrint('HTTP Request Error: $e');
+      return 0.0;
     }
   }
 
