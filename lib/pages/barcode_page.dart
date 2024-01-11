@@ -1,5 +1,7 @@
-import 'package:camera/camera.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 class BarCodePage extends StatefulWidget {
   const BarCodePage({super.key});
@@ -9,74 +11,45 @@ class BarCodePage extends StatefulWidget {
 }
 
 class _BarCodePageState extends State<BarCodePage> {
-  late List<CameraDescription> cameras;
-  late CameraController cameraController;
-
-  int direction = 0;
-
-  @override
-  void initState() {
-    startCamera(0);
-    super.initState();
-  }
-
-  void startCamera(int direction) async {
-  cameras = await availableCameras();
-
-  cameraController = CameraController(
-      cameras[direction],
-      ResolutionPreset.high,
-      enableAudio: false
-  );
-
-  await cameraController.initialize().then((value) {
-    if (!mounted) {
-      return;
-    }
-    setState(() {});
-  }).catchError((e) {
-    print(e);
-  });
-  }
-
-  @override
-  void dispose() {
-    cameraController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    if(cameraController.value.isInitialized) {
-      return Center(
-        child: Stack(
-          children: [
-            CameraPreview(cameraController),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  direction = direction == 0 ? 1 : 0;
-                  startCamera(direction);
-                });
+    return Scaffold(
+      appBar: AppBar(title: const Text('Mobile Scanner')),
+      body: MobileScanner(
+        allowDuplicates: false,
+        controller: MobileScannerController(
+          facing: CameraFacing.back,
+          torchEnabled: false,
+        ),
+        onDetect: (barcode, args) {
+          if (barcode.rawValue == null) {
+            debugPrint('Failed to scan Barcode');
+          } else {
+            final String code = barcode.rawValue!;
+            debugPrint('Barcode found! $code');
+
+            // Show a pop-up message
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Barcode Detected'),
+                  content: Text('Barcode: $code'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
               },
-              child : button(Icons.flip_camera_ios_outlined, Alignment.bottomLeft),
-            ),
-            GestureDetector(
-              onTap: () {
-                cameraController.takePicture().then((value) => {
-                  if(mounted) {
-                    // Envoie vers le vin en question
-                  }
-                });
-              },
-              child : button(Icons.camera_alt_outlined, Alignment.bottomCenter),
-            ),
-          ],
-        )
-      );
-    } else {
-      return const SizedBox();
-    }
+            );
+          }
+        },
+      ),
+    );
   }
 }
 
