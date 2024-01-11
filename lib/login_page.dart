@@ -1,5 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wine_shazam/main.dart';
+import '../models/user_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -96,29 +102,20 @@ class _LoginPageState extends State<LoginPage> {
         onPressed: () {
           debugPrint("Username : ${usernameController.text}");
           debugPrint("Password : ${passwordController.text}");
-        // HTTP request and redirection or display based on response
-          if(usernameController.text == 'showDialog') {
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  actions: [
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Close'),
-                      ),
-                    )
-                  ],
-                  title: const Center(child: Text('Incorrect password')),
-                  contentPadding: const EdgeInsets.all(20.0),
-                  content: const Text('No connection, no wine...'),
-                )
-            );
-          } else {
-            Navigator.pushNamed(context, '/homepage');
-          }
+          // HTTP request and redirection or display based on response
+          _loginWithCreadentials(
+              usernameController.text,
+              passwordController.text
+          ).then((user) => {
+            if(user != null) {
+              SharedPreferences.getInstance().then((prefs) => {
+                prefs.setString('user_username', user.username),
+                prefs.setString('user_email', user.email),
+                prefs.setInt('user_id', user.id),
+                Navigator.pushNamed(context, '/homepage')
+              })
+            }
+          });
         },
         style: ElevatedButton.styleFrom(
           shape: const StadiumBorder(),
@@ -134,6 +131,51 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(fontSize: 20)
             )
         ),
+    );
+  }
+
+  Future<User?> _loginWithCreadentials(String username, String password) async {
+    final url = 'http://${dotenv.env['SHAZVINCORE_HOST']}:3000/api/user/login';
+
+    try {
+      final response = await http.post(
+          Uri.parse(url),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            "username": username,
+            "password": password
+          }));
+
+      if (response.statusCode == 200) {
+        // Handle the successful response if needed
+        debugPrint('HTTP Request Successful: ${response.body}');
+
+        return _jsonToUser(response.body);
+      }
+      debugPrint('HTTP Request Failed: ${response.statusCode}');
+      return null;
+    } catch (e) {
+      rethrow;
+      // Handle potential errors during the request
+      debugPrint('HTTP Request Error: $e');
+      return null;
+    }
+  }
+
+  User? _jsonToUser(String jsonString) {
+    final Map<String, dynamic> userMap = json.decode(jsonString);
+    String createdAt = userMap['createdAt'] ?? '';
+    String updatedAt = userMap['updatedAt'] ?? '';
+
+    return User(
+        id: userMap['id'] ?? -1,
+        username: userMap['username'] ?? '',
+        email: userMap['email'] ?? '',
+        enabled: true,
+        createdAt: DateTime.tryParse(createdAt),
+        updatedAt: DateTime.tryParse(updatedAt)
     );
   }
 }

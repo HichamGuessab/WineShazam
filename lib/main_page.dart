@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wine_shazam/login_page.dart';
 import 'package:wine_shazam/main.dart';
 import 'package:wine_shazam/pages/barcode_page.dart';
@@ -38,12 +39,17 @@ class _MainPageState extends State<MainPage> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginPage(),
-                ),
-              );
+              SharedPreferences.getInstance().then((prefs) => {
+                prefs.remove('user_username'),
+                prefs.remove('user_email'),
+                prefs.remove('user_id'),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginPage(),
+                  ),
+                )
+              });
             },
             icon: const Icon(Icons.logout),
           ),
