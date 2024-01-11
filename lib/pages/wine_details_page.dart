@@ -33,9 +33,8 @@ class WineDetailsPage extends StatelessWidget {
               const SizedBox(height: 30),
 
               _buildSectionTitle("Vignoble"),
-              _buildInfoSection("Nom", wine.winery.name),
-              _buildInfoSection("Description", wine.winery.description),
-              _buildInfoSection("Adresse", wine.winery.address),
+              _buildInfoSection("Nom", wine.winery?.name ?? ''),
+              _buildInfoSection("Adresse", wine.winery?.address ?? ''),
             ],
           ),
         ),

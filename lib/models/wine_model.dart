@@ -4,15 +4,15 @@ class Wine {
   final int id;
   final String name;
   final String description;
-  final DateTime harvestingDate;
-  final DateTime bottlingDate;
+  final DateTime? harvestingDate;
+  final DateTime? bottlingDate;
   final double price;
-  final Winery winery;
+  final Winery? winery;
   final String vintageName;
   final String barCode;
   final bool enabled;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const Wine( {
     required this.id,
